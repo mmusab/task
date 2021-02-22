@@ -2,6 +2,7 @@
 import pandas as pd
 import os
 import numpy as np
+import librosa
 # from datetime import datetime, timedelta
 import datetime as dt
 import random
@@ -35,12 +36,19 @@ len(os.listdir(directory_of_sounds + '/vi95kMQ65UeU7K1wae12D1GUeXd2')) # should 
 # The simpler, the better. No need to use Tensorflow, pre-trained models, or anything like that.
 # Feel free to use libraries, but know that this is not a test of your modeling skills.
 
-def detect_coughs(file = 'sounds/samples/vi95kMQ65UeU7K1wae12D1GUeXd2/sample-1613658921823.m4a'):
+def detect_coughs(file):
     # Replace the below random code with something meaningful which
     # generates a one-column dataframe with a column named "peak_start"
-    peaks = np.random.sample(5) * 30
-    peaks.sort()
-    out = pd.DataFrame({'peak_start': peaks})
+    #*********************************** My_code ***********************************************
+
+    y, sr = librosa.load(file) #reading the sound file
+    # finding the maximum value representing the maximum peak (cough) in the file, then finding the location
+    # using sample ratio and finally multiplying it with total duration to get timestamp of respective peak(cough)
+    #-1 is used to go to the start of the peak
+    coughs = [( list(y).index(max(y))/len(y) )*librosa.get_duration(y)-1]
+
+    # ******************************************************************************************
+    out = pd.DataFrame({'peak_start': coughs})
     return(out)
 
 # Run function on all sounds
@@ -49,7 +57,7 @@ all_sounds = os.listdir(sounds_dir)
 out_list = []
 for i in range(len(all_sounds)):
     this_file = sounds_dir + all_sounds[i]
-    this_result = detect_coughs(file = this_file)
+    this_result = detect_coughs(this_file)
     this_result['file'] = this_file
     out_list.append(this_result)
 final = pd.concat(out_list)
