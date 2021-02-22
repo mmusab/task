@@ -41,11 +41,12 @@ def detect_coughs(file):
     # generates a one-column dataframe with a column named "peak_start"
     #*********************************** My_code ***********************************************
 
-    y, sr = librosa.load(file) #reading the sound file
-    # finding the maximum value representing the maximum peak (cough) in the file, then finding the location
-    # using sample ratio and finally multiplying it with total duration to get timestamp of respective peak(cough)
-    #-1 is used to go to the start of the peak
-    coughs = [( list(y).index(max(y))/len(y) )*librosa.get_duration(y)-1]
+    values, sr = librosa.load(file) #reading the sound file
+
+    MaximumValue = list(values).index(max(values))# Maximum value representing the maximum peak (cough) in the file
+    TotalSamples = len(values)# Total number of sample (size of list)
+    FileDuration = librosa.get_duration(values)# total file duration in secs
+    coughs = [(MaximumValue/TotalSamples) * FileDuration - 1]# getting the time stamp of peak value (-1 is used to go to the start of the peak)
 
     # ******************************************************************************************
     out = pd.DataFrame({'peak_start': coughs})
